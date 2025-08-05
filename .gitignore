@@ -3,10 +3,10 @@ __pycache__/
 *.py[codz]
 *$py.class
 
-.vscode/*
-
 # C extensions
 *.so
+
+.vscode/*
 
 # Distribution / packaging
 .Python
