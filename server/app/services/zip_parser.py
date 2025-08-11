@@ -3,14 +3,15 @@ import zipfile
 import os
 import sqlite3
 import json
+import shutil
 
-def zip_parser(zip_path: str) -> str:
+def zip_parser(zip_path: str, db_path: str) -> str:
     temp_dir = tempfile.mkdtemp()
 
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(temp_dir)
 
-    db_path = os.path.join(tempfile.gettempdir(), 'temp_instagram.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -62,19 +63,9 @@ def zip_parser(zip_path: str) -> str:
                     (username, link, timestamp)
                 )
 
-    cursor.execute("""
-        SELECT f.username
-        FROM following f
-        LEFT JOIN followers fl ON f.username = fl.username
-        WHERE fl.username IS NULL
-    """)
-    non_followers = cursor.fetchall()
-    print('non followers')
-    for user in non_followers:
-        print(user[0])
-
     conn.commit()
     conn.close()
 
-    print(f'db path: ${db_path}')
+    shutil.rmtree(temp_dir)
+
     return db_path

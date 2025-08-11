@@ -1,9 +1,17 @@
 import { useState } from "react";
 import "./App.css";
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
+
+interface InstagramUser {
+  username: string;
+  href: string;
+}
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
+  const [notFollowingBack, setNotFollowingBack] = useState<
+    InstagramUser[] | null
+  >(null);
 
   const handleFileUpload = async () => {
     if (!file) return;
@@ -16,7 +24,13 @@ function App() {
       },
     });
 
-    console.log(file);
+    await axios
+      .get("http://localhost:8000/people-not-following-user")
+      .then((res) => {
+        setNotFollowingBack(res.data);
+        console.log(typeof res.data);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -27,6 +41,10 @@ function App() {
         onChange={(e) => setFile(e.target.files?.[0] || null)}
       />
       <button onClick={handleFileUpload}>Upload Folder</button>
+      <ul>
+        {notFollowingBack &&
+          notFollowingBack.map((user) => <li>{user.username}</li>)}
+      </ul>
     </>
   );
 }
