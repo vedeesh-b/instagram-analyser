@@ -41,4 +41,44 @@ async def get_people_not_following():
     conn.close()
 
     return [{"username": row[0], "href": row[1]} for row in results]
-    
+
+@router.get('/texts')
+async def get_texts():
+    db_path = os.path.join('data', 'instagram-analytics.db')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT sender, timestamp, text, has_media
+        FROM messages
+        ORDER BY timestamp DESC
+        LIMIT 100
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    messages = [
+        {
+            "sender": row[0],
+            "timestamp": row[1],
+            "text": row[2],
+            "has_media": bool(row[3])
+        }
+        for row in rows
+    ]
+
+    return messages
+
+@router.get('/location-data')
+async def get_location_data():
+    db_path = os.path.join('data', 'instagram-analytics.db')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM location_data")
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    return rows

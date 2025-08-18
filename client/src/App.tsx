@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-import axios, { type AxiosResponse } from "axios";
+import axios from "axios";
 
 interface InstagramUser {
   username: string;
