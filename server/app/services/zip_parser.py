@@ -65,6 +65,16 @@ def zip_parser(zip_path: str, db_path: str) -> str:
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS story_locations (
+            latitude REAL,
+            longitude REAL,
+            timestamp INTEGER,
+            title TEXT,
+            UNIQUE(latitude, longitude, timestamp, title)
+        )
+    """)
+
     followers_path = os.path.join(temp_dir, "connections/followers_and_following/followers_1.json")
     if os.path.exists(followers_path):
         with open(followers_path, 'r', encoding='utf-8') as f:
@@ -182,6 +192,35 @@ def zip_parser(zip_path: str, db_path: str) -> str:
 
     for place in location_data['locations_of_interest']:
         cursor.execute("INSERT OR IGNORE INTO locations_of_interest (location_id, place) VALUES (?, ?)", (location_id, place))
+
+    story_locations_path = os.path.join(temp_dir, 'your_instagram_activity/media/stories.json')
+    if os.path.exists(story_locations_path):
+        with open(story_locations_path, 'r', encoding="utf-8") as story_locations:
+            stories_json = json.load(story_locations)
+            story_data = stories_json.get('ig_stories', [])
+            for story in story_data:
+                timestamp = story.get('creation_timestamp')
+                title = story.get('title', '')
+
+                latitude, longitude = '', ''
+
+                media_metadata = story.get('media_metadata', {})
+
+                if 'photo_metadata' in media_metadata:
+                    exif_data = media_metadata.get('photo_metadata', {}).get('exif_data', [])
+                else:
+                    exif_data = media_metadata.get('video_metadata', {}).get('exif_data', [])
+
+                for exif in exif_data:
+                    if 'latitude' in exif and 'longitude' in exif:
+                        latitude = exif.get('latitude', '')
+                        longitude = exif.get('longitude', '')
+                        break 
+
+                cursor.execute("""
+                    INSERT OR IGNORE INTO story_locations (latitude, longitude, timestamp, title)
+                    VALUES (?, ?, ?, ?)
+                """, (latitude, longitude, timestamp, title))
 
     conn.commit()
     conn.close()
