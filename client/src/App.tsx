@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import axios from "axios";
+import { Button } from "./components/ui/button";
 
 interface InstagramUser {
   username: string;
@@ -40,7 +41,7 @@ function App() {
         accept=".zip"
         onChange={(e) => setFile(e.target.files?.[0] || null)}
       />
-      <button onClick={handleFileUpload}>Upload Folder</button>
+      <Button onClick={handleFileUpload}>Upload Folder</Button>
       <ul>
         {notFollowingBack &&
           notFollowingBack.map((user) => <li>{user.username}</li>)}
