@@ -1,0 +1,7 @@
+nav {
+  background-color: #111;
+}
+
+nav > div:first-child {
+  width: 100%;
+}

@@ -1,52 +1,46 @@
-import { useState } from "react";
 import "./App.css";
-import axios from "axios";
 import { Button } from "./components/ui/button";
-
-interface InstagramUser {
-  username: string;
-  href: string;
-}
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "./components/ui/navigation-menu";
+import "./components/styles.css";
+import logoPath from "../src/assets/inVault-logo.png";
+import HeroSection from "./sections/HeroSection";
+import CardGroup from "./sections/CardGroup";
+import { ArchitectureSection } from "./sections/ArchitectureSection";
+import { TechStack } from "./sections/TechStack";
 
 function App() {
-  const [file, setFile] = useState<File | null>(null);
-  const [notFollowingBack, setNotFollowingBack] = useState<
-    InstagramUser[] | null
-  >(null);
-
-  const handleFileUpload = async () => {
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("file", file);
-
-    await axios.post("http://localhost:8000/parse-zip", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    await axios
-      .get("http://localhost:8000/people-not-following-user")
-      .then((res) => {
-        setNotFollowingBack(res.data);
-        console.log(typeof res.data);
-      })
-      .catch((err) => console.log(err));
-  };
-
   return (
-    <>
-      <input
-        type="file"
-        accept=".zip"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
-      />
-      <Button onClick={handleFileUpload}>Upload Folder</Button>
-      <ul>
-        {notFollowingBack &&
-          notFollowingBack.map((user) => <li>{user.username}</li>)}
-      </ul>
-    </>
+    <div className="mb-60">
+      <NavigationMenu className="w-full max-w-none py-4 px-60">
+        <NavigationMenuList className="justify-between">
+          <NavigationMenuItem>
+            <NavigationMenuLink
+              href="/"
+              className="flex flex-row gap-3 justify-center items-center"
+            >
+              <img src={logoPath} alt="Logo" className="h-6" />
+              <span className="text-xl text-white font-semibold font-['Familjen_Grotesk']">
+                inVault
+              </span>
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Button className="bg-[#342792]">Upload folder</Button>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+      <div id="landing-sections" className="px-60 my-32">
+        <HeroSection />
+        <CardGroup />
+        <ArchitectureSection />
+        <TechStack />
+      </div>
+    </div>
   );
 }
 
