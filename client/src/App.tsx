@@ -30,7 +30,7 @@ function App() {
             </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Button className="bg-[#342792]">Upload folder</Button>
+            <Button className="bg-[#342792] rounded-sm">Upload folder</Button>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
